@@ -1,5 +1,4 @@
-import React from 'react';
-import { Sparkles, FileText, Cpu, CheckCircle2 } from 'lucide-react';
+import { Sparkles, FileText, Cpu } from 'lucide-react';
 
 export default function Header({ serverStatus }) {
   return (

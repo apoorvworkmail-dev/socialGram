@@ -1,5 +1,5 @@
-import React from 'react';
-import { Edit3, Play, Trash2, Copy, Check, Hash, MessageSquare, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Edit3, Play, Trash2, Copy, Check } from 'lucide-react';
 
 export default function TextEditor({
   text,
@@ -8,7 +8,7 @@ export default function TextEditor({
   isAnalyzing,
   extractionSource
 }) {
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;

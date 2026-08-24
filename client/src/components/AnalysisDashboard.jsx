@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  TrendingUp,
-  Award,
-  BookOpen,
   Anchor,
   Megaphone,
   Smile,
   Hash,
   Sparkles,
-  CheckCircle,
   Copy,
   Check,
   RefreshCw,
@@ -34,11 +30,6 @@ export default function AnalysisDashboard({ data, onApplyVariation, onAddHashtag
     metrics = {}
   } = data;
 
-  const getScoreColor = (score) => {
-    if (score >= 80) return 'text-emerald-400 border-emerald-500/50 bg-emerald-500/10';
-    if (score >= 60) return 'text-amber-400 border-amber-500/50 bg-amber-500/10';
-    return 'text-red-400 border-red-500/50 bg-red-500/10';
-  };
 
   const getScoreBadge = (score) => {
     if (score >= 80) return { label: 'High Potential', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };

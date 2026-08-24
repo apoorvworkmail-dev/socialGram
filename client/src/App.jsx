@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/Header';
 import FileUpload from './components/FileUpload';
@@ -23,7 +23,7 @@ export default function App() {
         if (res.data && res.data.status === 'ok') {
           setServerConnected(true);
         }
-      } catch (err) {
+      } catch {
         console.warn('Backend server not connected, offline mode active.');
         setServerConnected(false);
       }
@@ -53,7 +53,6 @@ export default function App() {
         }
       } else {
         // Fallback Client Heuristics if server offline
-        const charCount = textToAnalyze.length;
         const words = textToAnalyze.trim().split(/\s+/).length;
 
         setAnalysisResults({

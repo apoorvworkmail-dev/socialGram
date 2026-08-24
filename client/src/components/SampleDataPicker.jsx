@@ -1,5 +1,4 @@
-import React from 'react';
-import { Sparkles, FileText, Image, AlertCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export default function SampleDataPicker({ onSelectSample }) {
   const samplePosts = [

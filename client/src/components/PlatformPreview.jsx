@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Eye, AlertTriangle, CheckCircle2, MessageSquare, Share2, Heart, Bookmark, Send } from 'lucide-react';
 
 export default function PlatformPreview({ text }) {
