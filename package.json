@@ -1,0 +1,27 @@
+{
+  "name": "socialgram-analyzer",
+  "version": "1.0.0",
+  "description": "Social Media Content Analyzer with PDF Parsing, OCR, and AI Engagement Analytics",
+  "main": "server/index.js",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "social-media",
+    "content-analyzer",
+    "ocr",
+    "tesseract",
+    "pdf-parse",
+    "nlp"
+  ],
+  "author": "Apoorv Mishra",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
