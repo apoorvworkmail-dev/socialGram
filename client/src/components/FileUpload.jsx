@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Upload, FileUp, Image, FileText, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
 import { createWorker } from 'tesseract.js';
+import { uploadDocument } from '../services/api';
 
 export default function FileUpload({ onTextExtracted, isProcessing, setIsProcessing }) {
   const [dragActive, setDragActive] = useState(false);
@@ -85,31 +85,40 @@ export default function FileUpload({ onTextExtracted, isProcessing, setIsProcess
         setStatusMessage('Extraction Complete!');
         onTextExtracted(text, file.name, 'Browser Tesseract.js OCR');
       } else {
-        // Process via Server API (handles both PDF parsing & server Tesseract OCR)
+        // Process via Backend API with automatic client-side OCR fallback
         setStatusMessage(isPdf ? 'Parsing PDF Document...' : 'Running Server OCR Extraction...');
-        setProgress(40);
+        setProgress(30);
 
-        const formData = new FormData();
-        formData.append('file', file);
+        try {
+          const resData = await uploadDocument(file, (uploadPercent) => {
+            setProgress(30 + Math.round(uploadPercent * 0.4));
+          });
 
-        const response = await axios.post('/api/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          onUploadProgress: (progressEvent) => {
-            const p = Math.round((progressEvent.loaded * 40) / progressEvent.total);
-            setProgress(40 + p);
+          setProgress(100);
+          if (resData && resData.success) {
+            setStatusMessage('Extraction Successful!');
+            onTextExtracted(
+              resData.text,
+              resData.fileName,
+              resData.extractionType
+            );
+          } else {
+            throw new Error(resData?.error || 'Extraction failed');
           }
-        });
-
-        setProgress(100);
-        if (response.data && response.data.success) {
-          setStatusMessage('Extraction Successful!');
-          onTextExtracted(
-            response.data.text,
-            response.data.fileName,
-            response.data.extractionType
-          );
-        } else {
-          throw new Error(response.data?.error || 'Extraction failed');
+        } catch (apiErr) {
+          // If server upload fails (e.g. standalone Vercel client without backend connected), run client-side OCR
+          if (isImage) {
+            setStatusMessage('Server unreachable. Running Client Browser OCR fallback...');
+            const worker = await createWorker('eng');
+            const ret = await worker.recognize(file);
+            const text = ret.data.text ? ret.data.text.trim() : '';
+            await worker.terminate();
+            setProgress(100);
+            setStatusMessage('Extraction Complete!');
+            onTextExtracted(text, file.name, 'Browser Client OCR');
+          } else {
+            throw apiErr;
+          }
         }
       }
     } catch (err) {

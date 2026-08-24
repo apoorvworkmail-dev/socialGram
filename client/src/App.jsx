@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import FileUpload from './components/FileUpload';
 import TextEditor from './components/TextEditor';
 import AnalysisDashboard from './components/AnalysisDashboard';
 import PlatformPreview from './components/PlatformPreview';
 import SampleDataPicker from './components/SampleDataPicker';
+import { checkHealth, analyzeContent } from './services/api';
 
 export default function App() {
   const [extractedText, setExtractedText] = useState('');
@@ -17,18 +17,18 @@ export default function App() {
 
   // Check API Connection on mount
   useEffect(() => {
-    const checkServer = async () => {
+    const pingServer = async () => {
       try {
-        const res = await axios.get('/api/health');
-        if (res.data && res.data.status === 'ok') {
+        const data = await checkHealth();
+        if (data && data.status === 'ok') {
           setServerConnected(true);
         }
-      } catch {
-        console.warn('Backend server not connected, offline mode active.');
+      } catch (err) {
+        console.warn('Backend server not connected or offline, running hybrid client fallback mode.');
         setServerConnected(false);
       }
     };
-    checkServer();
+    pingServer();
   }, []);
 
   // Handle Extracted Text from PDF / Image Upload
@@ -47,31 +47,80 @@ export default function App() {
     setIsAnalyzing(true);
     try {
       if (serverConnected) {
-        const res = await axios.post('/api/analyze', { text: textToAnalyze });
-        if (res.data && res.data.success) {
-          setAnalysisResults(res.data);
+        const data = await analyzeContent(textToAnalyze);
+        if (data && data.success) {
+          setAnalysisResults(data);
         }
       } else {
         // Fallback Client Heuristics if server offline
-        const words = textToAnalyze.trim().split(/\s+/).length;
+        const charCount = textToAnalyze.length;
+        const words = textToAnalyze.trim().split(/\s+/).filter(Boolean).length;
+        const sentences = textToAnalyze.split(/[.!?]+/).filter(s => s.trim().length > 0).length || 1;
 
         setAnalysisResults({
           success: true,
-          engagementScore: 78,
-          readability: { score: 72, label: 'Clear & Readable', wordCount: words },
-          hook: { score: 80, feedback: 'Strong opening hook!' },
+          engagementScore: Math.min(95, Math.max(65, Math.round(50 + (words > 15 ? 25 : 10) + (textToAnalyze.includes('?') ? 15 : 5)))),
+          readability: { score: 72, label: 'Clear & Readable', wordCount: words, sentenceCount: sentences, readingTimeMinutes: Math.max(1, Math.ceil(words / 200)) },
+          hook: {
+            firstLine: textToAnalyze.split('\n')[0] || textToAnalyze,
+            score: 80,
+            feedback: 'Strong opening hook!'
+          },
           cta: { score: 75, hasCTA: true, suggestion: 'Clear CTA included.' },
-          sentiment: { tone: 'Informative / Professional', sentiment: 'Positive' },
-          hashtags: { existingCount: 3, recommended: ['#SocialMediaTips', '#ContentGrowth', '#MarketingStrategy'] },
+          sentiment: {
+            tone: 'Informative / Professional',
+            sentiment: 'Positive',
+            emotions: [
+              { name: 'Curiosity', value: 80 },
+              { name: 'Confidence', value: 85 },
+              { name: 'Urgency', value: 40 },
+              { name: 'Engagement', value: 85 }
+            ]
+          },
+          hashtags: {
+            existingCount: (textToAnalyze.match(/#[a-zA-Z0-9_]+/g) || []).length,
+            recommended: [
+              { tag: '#SocialMediaTips', reach: 'High' },
+              { tag: '#ContentGrowth', reach: 'Very High' },
+              { tag: '#MarketingStrategy', reach: 'High' }
+            ]
+          },
+          postingSchedule: {
+            bestPlatform: 'LinkedIn',
+            audienceType: 'Industry professionals & tech creators',
+            recommendedTimes: ['Tuesday 9:00 AM - 11:00 AM', 'Thursday 1:00 PM - 3:00 PM'],
+            platformSuitability: { linkedin: 90, twitter: 80, instagram: 70 }
+          },
           suggestions: [
-            'Consider adding 1-2 line breaks to improve mobile reading flow.',
-            'Target your call to action at the very end of your caption.'
+            'Maintain high visual spacing with line breaks between paragraphs.',
+            'Keep your primary call to action focused at the very end of your post.'
           ],
           variations: [
-            { title: '🔥 Viral & High-Hook', text: `🚀 ${textToAnalyze}\n\n👇 What do you think? Drop a comment!` },
-            { title: '💼 Executive Professional', text: `📌 Key Insights:\n\n${textToAnalyze}\n\nRetweet / Share with your network!` }
+            {
+              title: '🔥 Viral & High-Hook',
+              text: `🚀 ${textToAnalyze.split('\n')[0] || textToAnalyze}\n\nHere is what 99% of people miss:\n👉 Point 1\n👉 Point 2\n\n👇 What's your take? Drop a comment below!\n\n#GrowthMindset #ViralContent`
+            },
+            {
+              title: '💼 Professional & Executive',
+              text: `📌 Key Insights:\n\n${textToAnalyze}\n\nSummary: Continuous optimization drives compounding reach.\n\n♻️ Repost with your network!`
+            },
+            {
+              title: '📖 Engaging Storytelling',
+              text: `I used to struggle with this until I realized one key thing... 💡\n\n"${textToAnalyze.substring(0, 80)}..."\n\nSave this post for later 🔖!`
+            },
+            {
+              title: '⚡ Minimalist / Punchy',
+              text: `${textToAnalyze.split('\n')[0] || textToAnalyze}\n\nAgree or disagree?`
+            }
           ],
-          metrics: { emojiCount: 2, hashtagCount: 3 }
+          metrics: {
+            characterCount: charCount,
+            wordCount: words,
+            sentenceCount: sentences,
+            readingTimeMinutes: Math.max(1, Math.ceil(words / 200)),
+            emojiCount: (textToAnalyze.match(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu) || []).length,
+            hashtagCount: (textToAnalyze.match(/#[a-zA-Z0-9_]+/g) || []).length
+          }
         });
       }
     } catch (err) {
@@ -139,7 +188,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-slate-800 bg-slate-900/40 py-6 text-center text-xs text-slate-500">
-        <p>Social Media Content Analyzer • Software Engineering Technical Assessment Project</p>
+        <p>Social Media Content Analyzer • Software Engineering Technical Assessment</p>
       </footer>
     </div>
   );
