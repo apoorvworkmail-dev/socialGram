@@ -9,11 +9,14 @@ export default defineConfig({
     tailwindcss()
   ],
   server: {
+    host: true, // Listen on all network interfaces (127.0.0.1, localhost, LAN)
     port: 3000,
+    strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        secure: false
       }
     }
   }
