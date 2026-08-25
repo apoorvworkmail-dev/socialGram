@@ -1,6 +1,20 @@
 # 📱 Social Media Content Analyzer
 
-A full-stack web application that extracts text from uploaded PDF documents and scanned images (via Tesseract OCR), analyzes social media posts, calculates engagement potential scores, and offers actionable optimization suggestions with AI-rewritten variations, best posting time recommendations, and multi-platform live previews.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://social-gram-kappa.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/apoorvworkmail-dev/socialGram)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?style=for-the-badge&logo=nodedotjs)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev)
+
+> 🚀 **Live Hosted Application**: **[https://social-gram-kappa.vercel.app/](https://social-gram-kappa.vercel.app/)**
+
+A production-ready full-stack web application that extracts text from uploaded PDF documents and scanned images (via Tesseract OCR), analyzes social media posts, calculates engagement potential scores, and offers actionable optimization suggestions with AI-rewritten variations, best posting time recommendations, and multi-platform live previews.
+
+---
+
+## 🌐 Live Deployment
+
+- **Frontend Application (Vercel)**: **[https://social-gram-kappa.vercel.app/](https://social-gram-kappa.vercel.app/)**
+- **GitHub Repository**: **[https://github.com/apoorvworkmail-dev/socialGram](https://github.com/apoorvworkmail-dev/socialGram)**
 
 ---
 
@@ -73,9 +87,12 @@ SoicalGram/
 - **Node.js**: v18.0.0 or higher
 - **npm**: v9.0.0 or higher
 
-### 1. 1-Click Install & Run (Root)
+### 1-Click Install & Run Locally
 
 ```bash
+# Install root dependencies
+npm install
+
 # Run both Frontend (port 3000) and Backend (port 5000) concurrently
 npm run dev
 ```
@@ -85,24 +102,9 @@ npm run dev
 
 ---
 
-## 🌐 Cloud Deployment (Vercel & Render)
-
-### Frontend (Vercel)
-1. Import repository on [Vercel](https://vercel.com).
-2. Set **Root Directory** to `client`.
-3. Set Framework Preset to `Vite`.
-4. Click **Deploy**.
-
-### Backend (Render)
-1. Create a New Web Service on [Render](https://render.com).
-2. Set Root Directory to `server`.
-3. Set Start Command to `npm start`.
-
----
-
 ## 🧪 Testing & Verification
 
-1. Open `http://localhost:3000` in your web browser.
+1. Open **[https://social-gram-kappa.vercel.app/](https://social-gram-kappa.vercel.app/)** in your web browser.
 2. **1-Click Sample Test**: Click on any of the sample cards at the top to load sample data and test engagement scoring immediately.
 3. **Upload PDF Document**: Drag & drop any PDF file to test structural text extraction.
 4. **Upload Scanned Image / Screenshot**: Upload a `.png` or `.jpg` scanned post to watch the real-time Tesseract OCR progress bar.
