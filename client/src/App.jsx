@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import FileUpload from './components/FileUpload';
 import TextEditor from './components/TextEditor';
@@ -23,7 +23,7 @@ export default function App() {
         if (data && data.status === 'ok') {
           setServerConnected(true);
         }
-      } catch (err) {
+      } catch {
         console.warn('Backend server not connected or offline, running hybrid client fallback mode.');
         setServerConnected(false);
       }

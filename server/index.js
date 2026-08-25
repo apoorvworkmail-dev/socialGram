@@ -13,6 +13,21 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Root API Discovery
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'Social Media Content Analyzer API',
+    version: '1.0.0',
+    endpoints: {
+      health: 'GET /api/health',
+      upload: 'POST /api/upload',
+      analyze: 'POST /api/analyze',
+      samples: 'GET /api/samples'
+    }
+  });
+});
+
 // Health Check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'Social Media Content Analyzer API', timestamp: new Date().toISOString() });
@@ -59,6 +74,18 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`✅ Social Media Analyzer Backend running on http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    const ALT_PORT = Number(PORT) + 1;
+    console.warn(`⚠️ Port ${PORT} is in use, starting backend fallback on http://localhost:${ALT_PORT}`);
+    app.listen(ALT_PORT, () => {
+      console.log(`✅ Social Media Analyzer Backend running on http://localhost:${ALT_PORT}`);
+    });
+  } else {
+    console.error('Server error:', err);
+  }
 });
