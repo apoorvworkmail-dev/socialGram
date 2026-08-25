@@ -2,7 +2,7 @@ services:
   - type: web
     name: socialgram-backend
     env: node
-    rootDir: server
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     envVars:
